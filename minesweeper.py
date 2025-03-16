@@ -25,6 +25,7 @@ class Board:
             for row in range(self.board_rows):
                 for col in range(self.board_cols):
                     if self.real_board[row][col] != 'X' and [row, col] != first_cell:
+                        # TODO: Ensure first click is surrounded by ' ' cells to avoid a numeric cell opening.
                         is_mine = random() <= self.pct_mines
                         if is_mine and mines > 0:
                             self.real_board[row][col] = 'X'
@@ -69,25 +70,24 @@ class Board:
         Parameters:
             row (int): The row position of the cell to be revealed. 
             col (int): The col position of the cell to be revealed.
+            visited_cells (list): The list of cells already visited during the search. Defaults to an empty list. 
 
         Returns:
             None
         '''
-        visited_cells += [[row, col, self.real_board[row][col]]]
-        adj_cells = adjacent_cells(self.real_board, row, col)
+        current_cell = [row, col, self.real_board[row][col]]
 
-        if all(cell in visited_cells for cell in adj_cells):
+        if current_cell in visited_cells:
             return
         
-
-        if 'X' in [cell[2] for cell in adj_cells]:
-            return
-        
+        visited_cells += [current_cell]
+        adj_cells = adjacent_cells(self.real_board, row, col)        
         self.player_board[row][col] = self.real_board[row][col]
-                
+                        
         for cell in adj_cells:
-            visited_cells += [cell]
-            self.reveal_cell(cell[0], cell[1])
+            if cell[2] in 'X': 
+                return
+            self.reveal_cell(cell[0], cell[1], visited_cells = visited_cells)
 
 class Player:
 
