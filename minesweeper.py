@@ -16,6 +16,9 @@ class Board:
         '''
         Generates the minesweeper board.
 
+        Parameters:
+            first_cell (list[int]): The coordinates of the first cell chosen. Note that because this is set before the board is generated that the first_cell is not structured as a cell is elsewhere. 
+
         Returns: 
             A Board object.
         '''
@@ -25,7 +28,8 @@ class Board:
             for row in range(self.board_rows):
                 for col in range(self.board_cols):
                     if self.real_board[row][col] != 'X' and [row, col] != first_cell:
-                        # TODO: Ensure first click is surrounded by ' ' cells to avoid a numeric cell opening.
+                        if [row, col, self.real_board[row][col]] in adjacent_cells(self.real_board, first_cell[0], first_cell[1]):
+                            continue
                         is_mine = random() <= self.pct_mines
                         if is_mine and mines > 0:
                             self.real_board[row][col] = 'X'
@@ -116,9 +120,11 @@ class Player:
 
         return value
     
-    def check_game_over(self):
-        '''Checks if the game is over.'''
+    def check_game_state(self):
+        '''Checks if the current board has a mine revealed.'''
         self.game_over = 'X' in flatten_list(self.board.player_board)
+        # TODO: Include a variable that checks for a win condition 
+        # # self.win_condition = self.board.player_board.n_revealed_cells == self.board.board_size - self.board.n_mines
 
 if __name__ == "__main__":
     # initialize
@@ -134,7 +140,7 @@ if __name__ == "__main__":
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
         player.board.reveal_cell(row, col)
         player.board.show_board('player')
-        player.check_game_over()
+        player.check_game_state()
     
     print("Thanks for playing!")
     
