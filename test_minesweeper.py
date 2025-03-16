@@ -57,7 +57,15 @@ def test_adjacent_cells():
 
     cells = adjacent_cells(valid_matrix, 1, 1)
 
-    assert len(cells) == 8, f"Expected len(cells) == 8, got {len(cells)}"
+    assert len(cells) == 8, f"Expected len(cells) == 8 for center cell selection, got {len(cells)}."
+
+    cells = adjacent_cells(valid_matrix, 0, 0)
+
+    assert len(cells) == 3, f"Expected len(cells) == 3 for corner cell selection, got {len(cells)}."
+
+    cells = adjacent_cells(valid_matrix, 0, 1)
+
+    assert len(cells) == 5, f"Expected len(cells) == 5 for edge cell selection, got {len(cells)}."
     
 
 if __name__ == "__main__":
