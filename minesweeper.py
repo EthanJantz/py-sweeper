@@ -50,7 +50,7 @@ class Board:
         Displays the board to the user.
 
         Parameters:
-            mode (str): Which perspective to show of the player board. 'player' shows only revealed cells, 'full' displays the every cell value. 
+            mode (str): Which perspective to show of the player board. 'player' shows only revealed cells, 'full' displays every cell value. 
 
         Returns:
             None
@@ -83,10 +83,11 @@ class Board:
         visited_cells += [current_cell]
         adj_cells = adjacent_cells(self.real_board, row, col)        
         self.player_board[row][col] = self.real_board[row][col]
+
+        if 'X' in [cell[2] for cell in adj_cells]:
+            return
                         
         for cell in adj_cells:
-            if cell[2] in 'X': 
-                return
             self.reveal_cell(cell[0], cell[1], visited_cells = visited_cells)
 
 class Player:
@@ -128,10 +129,12 @@ if __name__ == "__main__":
     player.board.reveal_cell(row, col)
     player.board.show_board('player')
 
+    # core gameplay loop
     while not player.game_over:
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
         player.board.reveal_cell(row, col)
         player.board.show_board('player')
         player.check_game_over()
+    
     print("Thanks for playing!")
     
