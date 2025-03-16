@@ -7,10 +7,12 @@ class Board:
 
     def __init__(self, board_size: list, pct_mines: float):
         self.board_rows, self.board_cols = board_size
+        self.board_size = self.board_rows * self.board_cols
         self.pct_mines = pct_mines # like 0.10
         self.n_mines = floor(self.board_rows * self.board_cols * self.pct_mines)
         self.real_board = [[' ' for _ in range(self.board_cols)] for _ in range(self.board_rows)]
         self.player_board = [['?' for _ in range(self.board_cols)] for _ in range(self.board_rows)]
+        self.n_revealed_cells = 0
 
     def generate_board(self, first_cell: List[int]):
         '''
@@ -87,6 +89,7 @@ class Board:
         visited_cells += [current_cell]
         adj_cells = adjacent_cells(self.real_board, row, col)        
         self.player_board[row][col] = self.real_board[row][col]
+        self.n_revealed_cells += 1
 
         if 'X' in [cell[2] for cell in adj_cells]:
             return
@@ -99,6 +102,7 @@ class Player:
     def __init__(self, board: Board):
         self.board = board
         self.game_over = False
+        self.win_condition = False
 
     def get_input(self, message: str = 'Input: '):
         '''
@@ -121,10 +125,9 @@ class Player:
         return value
     
     def check_game_state(self):
-        '''Checks if the current board has a mine revealed.'''
+        '''Checks if the current board has a mine revealed and whether all non-mine cells have been revealed.'''
         self.game_over = 'X' in flatten_list(self.board.player_board)
-        # TODO: Include a variable that checks for a win condition 
-        # # self.win_condition = self.board.player_board.n_revealed_cells == self.board.board_size - self.board.n_mines
+        self.win_condition = self.board.n_revealed_cells == self.board.board_size - self.board.n_mines
 
 if __name__ == "__main__":
     # initialize
@@ -136,7 +139,7 @@ if __name__ == "__main__":
     player.board.show_board('player')
 
     # core gameplay loop
-    while not player.game_over:
+    while not player.game_over and not player.win_condition:
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
         player.board.reveal_cell(row, col)
         player.board.show_board('player')
