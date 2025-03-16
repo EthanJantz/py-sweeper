@@ -131,7 +131,7 @@ class Player:
 
 if __name__ == "__main__":
     # initialize
-    board = Board([10, 10], .08)
+    board = Board([10, 10], .15)
     player = Player(board)
     row, col = player.get_input("Input row: "), player.get_input("Input col: ")
     player.board.generate_board([row, col])
