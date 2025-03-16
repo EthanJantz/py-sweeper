@@ -1,16 +1,7 @@
 from math import floor
 from random import random
 from typing import List
-
-def iterate_adjacent_cells(matrix: List[List[str]], row: int, col: int):
-    '''Yields adjacent cells in matrix from position matrix[row][col]'''
-    rows = len(matrix)
-    cols = len(matrix[0]) if rows > 0 else 0
-    for i in range(max(0, row - 1), min(rows, row + 2)):
-        for j in range(max(0, col - 1), min(cols, col + 2)):
-            if i == row and j == col:
-                continue  # Skip the central cell
-            yield i, j, matrix[i][j]
+from utility import * 
 
 class Board:
 
@@ -20,7 +11,6 @@ class Board:
         self.n_mines = floor(self.board_rows * self.board_cols * self.pct_mines)
         self.real_board = [[' ' for _ in range(self.board_cols)] for _ in range(self.board_rows)]
         self.player_board = [['?' for _ in range(self.board_cols)] for _ in range(self.board_rows)]
-        self.game_over = False
 
     def generate_board(self, first_cell: List[int]):
         '''
@@ -47,7 +37,7 @@ class Board:
                 for col in range(self.board_cols):
                     if self.real_board[row][col] == ' ':
                         adjacent_mines = 0
-                        for cell in iterate_adjacent_cells(self.real_board, row, col):
+                        for cell in adjacent_cells(self.real_board, row, col):
                             if cell[2] == 'X':
                                 adjacent_mines += 1
                         self.real_board[row][col] = str(adjacent_mines) if adjacent_mines > 0 else ' '
@@ -71,57 +61,39 @@ class Board:
             for lst in self.player_board:
                 print(*lst)
 
-    def reveal_cell(self, row: int, col: int):
+    def reveal_cell(self, row: int, col: int, visited_cells: list = []):
         '''
         Reveals the cell at board[row][col] and updates player_board to reflect the revealed information. 
+        Recursively checks adjacent cells using a depth first search algorithm and stops if a mine is in an adjacent cell.
 
         Parameters:
             row (int): The row position of the cell to be revealed. 
             col (int): The col position of the cell to be revealed.
 
         Returns:
-            A Board object.
+            None
         '''
-        def chain_reveal(cell: List, limit: int):
-            '''
-            Recursively look from cell to cell and reveal if it is blank. 
+        visited_cells += [[row, col, self.real_board[row][col]]]
+        adj_cells = adjacent_cells(self.real_board, row, col)
 
-            Parameters:
-                cell (list): A list containing row, col, and value of a cell.
-                limit (int): The total number of adjacent cells to the given cell.
+        if all(cell in visited_cells for cell in adj_cells):
+            return
+        
 
-            Returns:
-                None
-            '''
-            for cell in iterate_adjacent_cells(self.real_board, cell[0], cell[1]):
-                if cell[2] in ' 12345678':
-                    if self.player_board[cell[0]][cell[1]] != '?':
-                        limit -= 1
-                        if limit <= 0: return
-                    else:
-                        self.player_board[cell[0]][cell[1]] = self.real_board[cell[0]][cell[1]]
-                        lim = sum(1 for x in iterate_adjacent_cells(self.real_board, cell[0], cell[1]))
-                        chain_reveal(cell, lim)
-            
-        revealed_cell_value = self.real_board[row][col]
-        self.player_board[row][col] = revealed_cell_value
-        if revealed_cell_value == 'X': 
-            print('Game over')
-            self.show_board('full')
-            self.game_over = True
-        else:
-            if revealed_cell_value in ' 12345678':
-                lim = sum(1 for x in iterate_adjacent_cells(self.real_board, row, col))
-                chain_reveal([row, col], lim)
-            self.show_board('player')
-
-        return self
+        if 'X' in [cell[2] for cell in adj_cells]:
+            return
+        
+        self.player_board[row][col] = self.real_board[row][col]
+                
+        for cell in adj_cells:
+            visited_cells += [cell]
+            self.reveal_cell(cell[0], cell[1])
 
 class Player:
 
     def __init__(self, board: Board):
         self.board = board
-        self.game_over = self.board.game_over
+        self.game_over = False
 
     def get_input(self, message: str = 'Input: '):
         '''
@@ -145,18 +117,21 @@ class Player:
     
     def check_game_over(self):
         '''Checks if the game is over.'''
-        self.game_over = self.board.game_over
-
+        self.game_over = 'X' in flatten_list(self.board.player_board)
 
 if __name__ == "__main__":
-    board = Board([10, 10], .15)
+    # initialize
+    board = Board([10, 10], .08)
     player = Player(board)
     row, col = player.get_input("Input row: "), player.get_input("Input col: ")
     player.board.generate_board([row, col])
     player.board.reveal_cell(row, col)
+    player.board.show_board('player')
+
     while not player.game_over:
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
         player.board.reveal_cell(row, col)
+        player.board.show_board('player')
         player.check_game_over()
     print("Thanks for playing!")
     
