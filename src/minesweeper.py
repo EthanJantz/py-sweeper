@@ -62,11 +62,24 @@ class Board:
             None
         '''
         if mode == 'full':
-            for lst in self.real_board:
-                print(*lst)
-        elif mode == 'player':
-            for lst in self.player_board:
-                print(*lst)
+            board_to_print = self.real_board
+        else:
+            board_to_print = self.player_board
+
+        pprint_board = []
+        for idx, row in enumerate(board_to_print):
+            if idx == 0:
+                new_row = [str(i) + " | " for i in range(len(row) + 1)]
+                pprint_board.append(new_row)
+                new_row = ["----" for i in range(len(row) + 1)]
+                pprint_board.append(new_row)
+            new_row = [str(idx + 1), " | "] + [row[i] + " | " for i in range(len(row))]
+            pprint_board.append(new_row)
+            new_row = ["----" for i in range(len(row) + 1)]
+            pprint_board.append(new_row)
+        
+        for lst in pprint_board:
+            print(*lst, sep = "")
 
     def reveal_cell(self, row: int, col: int, visited_cells: list = []):
         '''
@@ -122,7 +135,7 @@ class Player:
             except:
                 continue
 
-        return value
+        return value - 1 # currently only row, col are being input. this aligns the response with the board indexing
     
     def check_game_state(self):
         '''Checks if the current board has a mine revealed and whether all non-mine cells have been revealed.'''
@@ -131,8 +144,11 @@ class Player:
 
 if __name__ == "__main__":
     # initialize
-    board = Board([10, 10], .15)
+    board = Board([9, 9], .15)
     player = Player(board)
+
+    # first move
+    player.board.show_board('player')
     row, col = player.get_input("Input row: "), player.get_input("Input col: ")
     player.board.generate_board([row, col])
     player.board.reveal_cell(row, col)
