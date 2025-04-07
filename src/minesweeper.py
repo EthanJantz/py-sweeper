@@ -110,6 +110,9 @@ class Board:
         for cell in adj_cells:
             self.reveal_cell(cell[0], cell[1], visited_cells = visited_cells)
 
+    def flag_cell(self, row: int, col: int):
+        self.player_board[row][col] = '@'
+
 class Player:
 
     def __init__(self, board: Board):
@@ -117,7 +120,7 @@ class Player:
         self.game_over = False
         self.win_condition = False
 
-    def get_input(self, message: str = 'Input: '):
+    def get_input(self, message: str = 'Input: ', type: str = 'reveal'):
         '''
         Gets input from player. Input must evaluate to an int.
 
@@ -127,16 +130,13 @@ class Player:
         Returns:
             The input value. 
         '''
-        value = None
-        while not isinstance(value, int):
-            value = input(message)
-            try:
-                value = int(value)
-            except:
-                continue
+        value = input(message)
+        try:
+            value = int(value)
+            return value - 1 # currently only row, col are being input. this aligns the response with the board indexing
+        except:
+            return value
 
-        return value - 1 # currently only row, col are being input. this aligns the response with the board indexing
-    
     def check_game_state(self):
         '''Checks if the current board has a mine revealed and whether all non-mine cells have been revealed.'''
         self.game_over = 'X' in flatten_list(self.board.player_board)
@@ -156,8 +156,18 @@ if __name__ == "__main__":
 
     # core gameplay loop
     while not player.game_over and not player.win_condition:
+        action_type = ' '
+        while action_type not in 'revealflag':
+            action_type = player.get_input("flag or reveal [f/r]: ")
+
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
-        player.board.reveal_cell(row, col)
+        
+        if action_type in 'reveal':
+            player.board.reveal_cell(row, col)
+
+        if action_type in 'flag':
+            player.board.flag_cell(row, col)
+        
         player.board.show_board('player')
         player.check_game_state()
     
