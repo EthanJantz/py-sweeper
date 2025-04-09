@@ -129,7 +129,7 @@ class Player:
         self.game_over = False
         self.win_condition = False
 
-    def get_input(self, message: str = 'Input: ', type: str = 'reveal'):
+    def get_input(self, message: str = 'Input: '):
         '''
         Gets input from player. Input must evaluate to an int.
 
@@ -149,6 +149,12 @@ class Player:
         '''Checks if the current board has a mine revealed and whether all non-mine cells have been revealed.'''
         self.game_over = 'X' in flatten_list(self.board.player_board)
         self.win_condition = self.board.n_revealed_cells == self.board.board_size - self.board.n_mines
+
+        if self.game_over:
+            print("Game over!")
+
+        if self.win_condition:
+            print("Congratulations, you won!")
 
 if __name__ == "__main__":
     # initialize
