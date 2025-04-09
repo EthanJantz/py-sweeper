@@ -66,16 +66,19 @@ class Board:
         else:
             board_to_print = self.player_board
 
+        padding_value = len(str(self.board_cols))
+        grid_chars = '-' * len(str(self.board_cols) + " | ")
+
         pprint_board = []
         for idx, row in enumerate(board_to_print):
             if idx == 0:
-                new_row = [str(i) + " | " for i in range(len(row) + 1)]
+                new_row = [str(i).ljust(padding_value) + " | " for i in range(len(row) + 1)]
                 pprint_board.append(new_row)
-                new_row = ["----" for i in range(len(row) + 1)]
+                new_row = [grid_chars for _ in range(len(row) + 1)]
                 pprint_board.append(new_row)
-            new_row = [str(idx + 1), " | "] + [row[i] + " | " for i in range(len(row))]
+            new_row = [str(idx + 1).ljust(padding_value), " | "] + [row[i].ljust(padding_value) + " | " for i in range(len(row))]
             pprint_board.append(new_row)
-            new_row = ["----" for i in range(len(row) + 1)]
+            new_row = [grid_chars for _ in range(len(row) + 1)]
             pprint_board.append(new_row)
         
         for lst in pprint_board:
