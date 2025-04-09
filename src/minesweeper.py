@@ -151,7 +151,8 @@ class Player:
         self.win_condition = self.board.n_revealed_cells == self.board.board_size - self.board.n_mines
 
         if self.game_over:
-            print("Game over!")
+            print("That was a mine, game over!")
+            self.board.show_board('full')
 
         if self.win_condition:
             print("Congratulations, you won!")
