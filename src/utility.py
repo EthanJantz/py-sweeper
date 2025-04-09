@@ -6,8 +6,6 @@ def is_2d_array(list_):
         return False
     if not list_:  # Empty list
         return False
-    if not isinstance(list_[0], list):
-        return False
     row_len = len(list_[0])
     for row in list_:
         if not isinstance(row, list) or len(row) != row_len:
@@ -35,11 +33,11 @@ def adjacent_cells(matrix: List[List[str]], row: int, col: int):
     
     rows = len(matrix)
     cols = len(matrix[0]) if rows > 0 else 0
-    assert row >= 0 and row <= rows, "Input: row must be >= 0 and <= the number of rows in matrix."
-    assert col >= 0 and col <= cols, "Input: col must be >= 0 and <= the number of cols in matrix."
+    assert row >= 0 and row <= rows, f"Input: row must be >= 0 and <= {rows}"
+    assert col >= 0 and col <= cols, f"Input: col must be >= 0 and <= {cols}"
 
     cells = []
-    for i in range(max(0, row - 1), min(rows, row + 2)):
+    for i in range(max(0, row - 1), min(rows, row + 2)): # row + 2 because range(stop) is not inclusive
         for j in range(max(0, col - 1), min(cols, col + 2)):
             if i == row and j == col:
                 continue  # Skip the central cell
