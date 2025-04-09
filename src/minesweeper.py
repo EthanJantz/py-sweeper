@@ -111,6 +111,15 @@ class Board:
             self.reveal_cell(cell[0], cell[1], visited_cells = visited_cells)
 
     def flag_cell(self, row: int, col: int):
+        '''Flag a given cell as a potential mine.
+        
+        Parameters:
+            row (int): The row position of the cell to be flagged. 
+            col (int): The col position of the cell to be flagged.
+
+        Returns:
+            None
+        '''
         self.player_board[row][col] = '@'
 
 class Player:
@@ -132,10 +141,9 @@ class Player:
         '''
         value = input(message)
         try:
-            value = int(value)
-            return value - 1 # currently only row, col are being input. this aligns the response with the board indexing
+            return int(value) - 1 # row, col inputs
         except:
-            return value
+            return value 
 
     def check_game_state(self):
         '''Checks if the current board has a mine revealed and whether all non-mine cells have been revealed.'''
@@ -157,7 +165,7 @@ if __name__ == "__main__":
     # core gameplay loop
     while not player.game_over and not player.win_condition:
         action_type = ' '
-        while action_type not in 'revealflag':
+        while action_type not in 'rf':
             action_type = player.get_input("flag or reveal [f/r]: ")
 
         row, col = player.get_input("Input row: "), player.get_input("Input col: ")
