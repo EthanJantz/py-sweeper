@@ -123,7 +123,10 @@ class Board:
         Returns:
             None
         '''
-        self.player_board[row][col] = '@'
+        if self.player_board[row][col] not in '@?':
+            return
+        flag_swapper = {'?': '@', '@': '?'}
+        self.player_board[row][col] = flag_swapper[self.player_board[row][col]]
 
 class Player:
 
